@@ -2,9 +2,9 @@ import numpy as np
 import pickle
 import operator
 
-question = np.load('pad_question.npy')
-answer = np.load('pad_answer.npy')
-answer_o = np.load('answer_o.npy')
+question = np.load('pad_question.npy',allow_pickle=True)
+answer = np.load('pad_answer.npy',allow_pickle=True)
+answer_o = np.load('answer_o.npy',allow_pickle=True)
 with open('vocab_bag.pkl', 'rb') as f:
     words = pickle.load(f)
 with open('pad_word_to_index.pkl', 'rb') as f:
@@ -36,7 +36,7 @@ def generate_train(batch_size):
 from keras.layers import Embedding
 from keras.layers import Input, Dense, LSTM, TimeDistributed, Bidirectional, Dropout, Concatenate, RepeatVector, Activation, Dot
 from keras.layers import concatenate, dot                    
-from keras.layers.attention import AttentionLayer
+from keras.layers.attention import Attention as AttentionLayer
 from keras.models import Model
 from keras.utils import plot_model
 from keras.callbacks import ModelCheckpoint, TensorBoard
@@ -113,6 +113,10 @@ import matplotlib.pyplot as plt
 import matplotlib
 import jieba
 import requests
+
+# from keras.preprocessing.sequence import pad_sequences
+from keras.utils import pad_sequences
+
 def act_weather(city):
     #TODO: Get weather by api
     url = 'http://wthrcdn.etouch.cn/weather_mini?city=' + city
@@ -129,7 +133,9 @@ def input_question(seq):
         seq = np.array([word_to_index[w] for w in seq])
     except KeyError:
         seq = np.array([36874, 165, 14625])
-    seq = sequence.pad_sequences([seq], maxlen=maxLen,
+    # seq = sequence.pad_sequences([seq], maxlen=maxLen,
+    #                                       padding='post', truncating='post')
+    seq = pad_sequences([seq], maxlen=maxLen,
                                           padding='post', truncating='post')
     print(seq)
     return seq, sentence
